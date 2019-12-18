@@ -1,0 +1,33 @@
+v-bind
+v-bind 主要用于动态绑定dom元素属性(attribute),即元素属性实际的值是由vm实例中的data属性提供的。如：
+<!DOCTYPE html>
+<html>
+    <!DOCTYPE html>
+    <html>
+    <head>
+    <meta charset="utf-8">
+    <title>Vue 测试实例</title>
+    <style>
+      [v-coak]{
+        display: none;
+      }
+    </style>
+    <script src="https://cdn.staticfile.org/vue/2.2.2/vue.min.js"></script>
+    </head>
+    <body>
+    <div id="app">
+      <p  v-cloak>{{ msg }}</p>
+      <input type="button" value="按钮" v-bind:title="mytitle">
+    </div>
+    
+    <script>
+    new Vue({
+      el: '#app',
+      data: {
+        msg: '123',
+        mytitle:'这是一个自己定义的title'
+      }
+    })
+    </script>
+    </body>
+    </html>
