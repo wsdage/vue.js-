@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <!--//导入js包-->
+    <script src="js/vue.js"></script>
+    <!-- Bootstrap -->
+    <link href="./bootstrap/dist/css/bootstrap.css" rel="stylesheet">
+<body>
+<div id="app">
+    <div class="panel panel-primary">
+        <div class="panel-heading">
+            <h3 class="panel-title"></h3>
+        </div>
+        <div class="panel-body form-inline">
+            <label>
+                id：
+                <input type="text" class="form-control" v-model="id">
+            </label>
+            <label>
+                name：
+                <input type="text" class="form-control" v-model="name" @keyup.enter="add">
+            </label>
+
+            <input type="button" value="添加" class="btn btn-primary" @click="add()">
+            <label>
+                搜索：
+                <input type="text" class="form-control" v-model="keywords">
+            </label>
+        </div>
+    </div>
+
+
+    <table class="table table-bordered table-hover table-striped">
+        <thead>
+        <tr>
+            <th>id</th>
+            <th>name</th>
+            <th>data</th>
+            <th>operation</th>
+        </tr>
+        </thead>
+        <tbody>
+<!--        之前，v-for的数据都是从data中直接取，-->
+<!--现在直接定义一个方法，通过传参的形式来-->
+        <tr v-for="item in search(keywords) " :key="item.id">
+            <td>{{item.id}}</td>
+            <td>{{item.name}}</td>
+            <td>{{item.data | msgFormat(pattern="")}}</td>
+            <td>
+<!--                prevent阻止默认行为-->
+                <a href="" @click.prevent="del(item.id)" >删除</a>
+            </td>
+
+        </tr>
+
+        </tbody>
+    </table>
+
+</div>
+
+
+<script type="text/javascript">
+    //定义一个全局的过滤器，进行时间的格式化
+    Vue.filter('msgFormat',function (dateStr,pattern) {
+        //根据给定的时间字符串，得到特定的时间
+        var dt= new Date(dateStr)
+        var y=dt.getFullYear();
+       var  m =dt.getMonth();
+       var d= dt.getDate();
+       // return `${y}-${m}-${d}`
+//不管输入的是什么都变为小写
+        if(pattern.toLowerCase() == 'yyyy-mm-dd'){
+            return `${y}-${m}-${d}`
+        }else {
+            var hh=dt.getHours()
+            var  mm =dt.getMinutes()
+            var ss=dt.getSeconds()
+            return `${y}-${m}-${d}  ${hh}:${mm}:${ss}`
+        }
+
+    })
+
+    //2.创建一个实例
+    //这里：new出来的这个就是我们mvvm中的vm调度者
+    new Vue({
+        el: '#app',//表示我们new的这个vue实例要控制的区域
+        data: {//data就是mvvm中的m
+            //data属性中，存放的是el中要用到的数据
+            id: '',
+            name: '',
+            keywords:'',
+            list: [
+                {id: 1, name: '宝马', data: new Date()},
+                {id: 2, name: '喷赤', data: new Date()},
+                {id: 3, name: '法拉第', data: new Date()},
+                {id: 4, name: '奥迪', data: new Date()}
+
+            ]
+        },
+        methods: {
+            add() {
+                console.log("add")
+                //获取到id和name，直接从data上获取，做了双向数据绑定
+                //直接把添加的属性，增加到list集合里面
+                var cat={id:this.id, name:this.name,data:new Date()}
+                this.list.push(cat)
+                //把输入置空从右到左
+                this.id=this.name=''
+
+            },
+            del(id){ //根据id删除数据
+                //分析：如何根据id，找到要删除的索引
+                //如果找到索引直接调用数组的splic方法
+                //some() 在数组中查询，如果return true，就会终止这个数据的后续循环
+                console.log("del")
+                    //方法一
+                // this.list.some((item ,i) =>{
+                //    if(item.id==id){
+                // this.list.splice(i,1)
+                //        return ture;
+                //    }
+                // })
+                //方法二
+                var index=this.list.findIndex(item => {
+                    if(item.id==id){
+                        return true;
+
+                    }
+                })
+                this.list.splice(index,1)
+
+            },
+            search(keywords){
+                //方法1
+                // var newList=[]
+                // this.list.forEach( item =>{
+                //     if(item.name.indexOf(keywords) !=-1){
+                // newList.push(item)
+                //     }
+                // })
+                // return newList;
+                //方法2： forEach  some   filter findIndex 都是属于数组的新方法
+
+              return   this.list.filter( item =>{
+                    //注意:includes  包含
+                    if(item.name.includes(keywords)){
+return item;
+                    }
+                })
+
+            }
+        }
+    });
+
+
+
+    //过滤器的定义语法
+    //Vue.filter（'过滤器名称'，function（）{}）
+    //过滤器中的function,第一个参数已经被规定死了，永远都是过滤器管道符前面传过来的数据
+</script>
+
+</body>
+</html>
+
+<!--过滤器调用时候的格式 {{name | 过滤器的名称}} -->
